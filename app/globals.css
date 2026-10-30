@@ -139,10 +139,11 @@ a { color: inherit; text-decoration: none; }
 
 .genre-section { padding-top: 96px; }
 .genre-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 12px; }
-.genre-card { position: relative; overflow: hidden; min-height: 130px; padding: 18px; border: 1px solid var(--line); border-radius: 18px; text-align: start; background: linear-gradient(145deg, color-mix(in srgb, var(--genre) 26%, #121218), #111116 70%); display: flex; flex-direction: column; justify-content: end; gap: 5px; cursor: pointer; animation: rise .55s both; animation-delay: calc(var(--i) * 50ms); }
-.genre-card::before { content: ""; position: absolute; width: 100px; height: 100px; border-radius: 50%; background: var(--genre); filter: blur(45px); opacity: .25; left: -25px; top: -30px; }
-.genre-card svg { color: var(--genre); margin-bottom: 10px; }
-.genre-card span { color: #8d8d96; font-size: 10px; }
+.genre-card { position: relative; overflow: hidden; min-height: 130px; padding: 18px; border: 1px solid rgba(197,160,89,.15); border-radius: 15px; text-align: start; background: linear-gradient(145deg, #111, #090909 76%); display: flex; flex-direction: column; justify-content: end; gap: 5px; cursor: pointer; transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.genre-card:hover { border-color: rgba(197,160,89,.46); background: linear-gradient(145deg, #17140e, #0a0a0a 76%); transform: translateY(-2px); }
+.genre-icon { width: 42px; height: 42px; display: grid; place-items: center; margin-bottom: 9px; border: 1px solid rgba(197,160,89,.2); border-radius: 12px; background: rgba(197,160,89,.08); color: #d0ac67; }
+.genre-card strong { font-size: 13px; }
+.genre-card > span:last-child { color: #898989; font-size: 10px; }
 footer { border-top: 1px solid var(--line); margin-top: 70px; padding: 55px clamp(20px, 4.5vw, 76px) 100px; display: grid; gap: 20px; justify-items: center; text-align: center; color: #85858e; }
 footer p { margin: 0; font-size: 13px; }
 footer > div:not(.brand) { display: flex; gap: 24px; font-size: 12px; }
@@ -387,9 +388,6 @@ footer small { color: #55555d; }
 }
 .mobile-sheet nav { display: grid; gap: 2px; }
 .mobile-sheet nav a { display: flex; align-items: center; gap: 8px; padding: 12px 4px; font-size: 15px; color: #d7d7dc; }
-.mobile-langs { display: flex; gap: 8px; margin-top: 14px; }
-.mobile-langs button { flex: 1; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: #15151a; font-size: 11px; cursor: pointer; }
-.mobile-langs button.active { background: var(--red); border-color: var(--red); }
 
 .page { padding: 120px clamp(20px,4.5vw,76px) 40px; max-width: 1600px; margin: 0 auto; }
 .page-intro { margin-bottom: 28px; display: grid; gap: 8px; max-width: 760px; }
@@ -471,7 +469,8 @@ footer small { color: #55555d; }
 .filter-toggle.active { border-color: rgba(255,53,77,.5); color: white; }
 .filter-advanced { display: none; }
 .filter-advanced.open { display: flex; }
-.results-meta { color: #8e8e98; font-size: 12px; display: flex; gap: 12px; align-items: center; min-height: 18px; }
+.catalog-loading { display: flex; align-items: center; gap: 8px; color: #a1a1a1; font-size: 12px; }
+.catalog-error { padding: 10px 13px; border: 1px solid rgba(219,90,90,.25); border-radius: 9px; background: rgba(219,90,90,.06); color: #e99a9a; font-size: 12px; }
 .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 22px 15px; }
 .media-grid.compact { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); }
 .progress-card { position: relative; }
@@ -1474,11 +1473,10 @@ h1, h2, h3, .hero h1, .section-heading h2, .page-intro h1,
   box-shadow: 0 24px 60px rgba(0,0,0,.6);
 }
 .lang-popover button:hover, .lang-popover button.active,
-.mobile-sheet nav a:hover, .mobile-langs button.active {
+.mobile-sheet nav a:hover {
   color: var(--accent);
   background: rgba(197,160,89,.09);
 }
-.mobile-langs button.active { border-color: rgba(197,160,89,.45); }
 
 .hero { min-height: min(760px, 92svh); padding-inline: clamp(22px, 7vw, 112px); }
 .hero::after {

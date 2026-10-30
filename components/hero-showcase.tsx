@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Info, ListPlus, Play, Sparkles, Star } from "lucide-react";
+import { Info, ListPlus, Play, Star } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
 import { detailPath, watchPath } from "@/lib/catalog/routes";
 import { titleBackdrop } from "@/lib/catalog/images";
@@ -76,10 +76,6 @@ export function HeroShowcase({
       )}
 
       <div className="hero-copy">
-        <div className="eyebrow">
-          <Sparkles size={14} /> {t("home.heroKicker")}
-          {featured.isDemo && <span className="demo-pill">{t("common.demo")}</span>}
-        </div>
         <h1>{featured.title}</h1>
         <div className="hero-meta">
           {featured.voteAverage ? (

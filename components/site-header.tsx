@@ -10,7 +10,6 @@ import {
   LogIn,
   Menu,
   Radio,
-  Search,
   Shield,
   X,
 } from "lucide-react";
@@ -98,9 +97,6 @@ export function SiteHeader({
       </nav>
 
       <div className="top-actions">
-        <Link href={localePath(locale, "/search")} aria-label={t("common.search")} className="icon-btn">
-          <Search size={20} />
-        </Link>
         <button aria-label={t("common.live")} className="icon-btn" onClick={() => router.push(localePath(locale, "/live"))}>
           <Radio size={19} />
         </button>
@@ -187,18 +183,6 @@ export function SiteHeader({
               {t("common.history")}
             </Link>
           </nav>
-          <div className="mobile-langs">
-            {locales.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={item === locale ? "active" : undefined}
-                onClick={() => changeLocale(item)}
-              >
-                {localeShortNames[item]}
-              </button>
-            ))}
-          </div>
         </div>
       )}
     </header>

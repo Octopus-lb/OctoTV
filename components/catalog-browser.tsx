@@ -30,7 +30,6 @@ export function CatalogBrowser({
 }) {
   const { t, formatNumber } = useI18n();
   const [items, setItems] = useState<CatalogTitle[]>(initial.items);
-  const [totalResults, setTotalResults] = useState(initial.totalResults);
   const [page, setPage] = useState(initial.page);
   const [totalPages, setTotalPages] = useState(initial.totalPages);
   const [query, setQuery] = useState(initialQuery);
@@ -62,7 +61,6 @@ export function CatalogBrowser({
         if (!response.ok) throw new Error("catalog_unavailable");
         const data = (await response.json()) as CatalogPage;
         setItems(data.items);
-        setTotalResults(data.totalResults);
         setPage(data.page);
         setTotalPages(Math.max(data.totalPages, 1));
       } catch (caught) {
@@ -167,16 +165,12 @@ export function CatalogBrowser({
         )}
       </div>
 
-      <div className="results-meta">
-        {loading ? (
-          <span className="inline-loading">
-            <LoaderCircle className="spin" size={15} /> {t("common.loading")}
-          </span>
-        ) : (
-          <span>{formatNumber(totalResults)}</span>
-        )}
-        {error && <span className="error-text">{error}</span>}
-      </div>
+      {loading && (
+        <div className="catalog-loading" role="status">
+          <LoaderCircle className="spin" size={16} /> {t("common.loading")}
+        </div>
+      )}
+      {error && <div className="catalog-error" role="alert">{error}</div>}
 
       {!loading && items.length === 0 ? (
         <div className="empty-state">
