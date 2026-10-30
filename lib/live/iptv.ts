@@ -1,5 +1,5 @@
 import { cached } from "@/lib/metadata/cache";
-import { filterChannels, parseM3U } from "./filters";
+import { filterChannels, isIsraeliChannel, parseM3U } from "./filters";
 import type { ChannelFilters, LiveChannel, LiveSource } from "./types";
 
 export { filterChannels, parseM3U };
@@ -11,8 +11,8 @@ export type ChannelFacets = {
 
 function channelFacets(channels: LiveChannel[]): ChannelFacets {
   return {
-    countries: [...new Set(channels.map((channel) => channel.country).filter((value): value is string => Boolean(value)))].sort(),
-    categories: [...new Set(channels.flatMap((channel) => channel.categories))].sort(),
+    countries: [...new Set(channels.filter((channel) => !isIsraeliChannel(channel)).map((channel) => channel.country).filter((value): value is string => Boolean(value)))].sort(),
+    categories: [...new Set(channels.filter((channel) => !isIsraeliChannel(channel)).flatMap((channel) => channel.categories))].sort(),
   };
 }
 
@@ -92,7 +92,7 @@ export async function loadApiChannels(): Promise<LiveChannel[]> {
             sourceCount: sources.length,
           };
         })
-        .filter((channel) => channel.sourceCount > 0);
+        .filter((channel) => channel.sourceCount > 0 && !isIsraeliChannel(channel));
     },
     { ttlMs: 30 * 60 * 1000, staleOnError: true },
   );

@@ -4,6 +4,11 @@ function attr(line: string, name: string): string {
   return line.match(new RegExp(`${name}="([^"]*)"`, "i"))?.[1] ?? "";
 }
 
+/** Hide Israeli channels by country metadata or the IPTV-org country ID suffix. */
+export function isIsraeliChannel(channel: Pick<LiveChannel, "country" | "id">): boolean {
+  return channel.country?.toUpperCase() === "IL" || /(?:^|[.@])il(?:[.@]|$)/i.test(channel.id);
+}
+
 /**
  * Minimal M3U parser for IPTV-org playlists. Only the attributes needed by the
  * UI are read; playlist URLs are treated as untrusted input.
@@ -46,8 +51,8 @@ export function parseM3U(source: string): LiveChannel[] {
 }
 
 /**
- * Applies country/language/category/search filters. Adult channels are hidden
- * unless explicitly requested, and blocked IDs always win.
+ * Applies country/category/search filters. Israeli, adult, blocked, and
+ * unavailable channels are always excluded.
  */
 export function filterChannels(
   channels: LiveChannel[],
@@ -56,6 +61,7 @@ export function filterChannels(
   const query = filters.query?.trim().toLowerCase() ?? "";
 
   return channels.filter((channel) => {
+    if (isIsraeliChannel(channel)) return false;
     if (!filters.includeNsfw && channel.isNsfw) return false;
     if (filters.blockedIds?.has(channel.id)) return false;
     if (filters.country && channel.country?.toLowerCase() !== filters.country.toLowerCase()) {

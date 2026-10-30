@@ -140,8 +140,11 @@ test("channel filters always exclude NSFW and blocked sources by default", () =>
     sourceCount: 1,
   });
   const channels = [channel("safe", false, "Arab News"), channel("adult", true, "Arab Adult")];
+  const israeliByCountry = { ...channel("country-il", false, "Regional News"), country: "IL" };
+  const israeliById = { ...channel("channel.il", false, "Regional News"), country: null };
   assert.deepEqual(filterChannels(channels, { country: "SA", query: "arab" }).map((item) => item.id), ["safe"]);
   assert.deepEqual(filterChannels(channels, { includeNsfw: true, blockedIds: new Set(["safe"]) }).map((item) => item.id), ["adult"]);
+  assert.deepEqual(filterChannels([...channels, israeliByCountry, israeliById], { includeNsfw: true }).map((item) => item.id), ["safe", "adult"]);
 });
 
 test("channel country and category filters match normalized metadata", () => {

@@ -377,20 +377,28 @@ export function LiveExperience({
               )}
             </div>
 
-            <div className="live-meta">
-              <div>
-                <small>{t("live.now")}</small>
-                <strong>{epg.now?.title ?? t("live.noPrograms")}</strong>
+            {(epg.now?.title || epg.next[0]?.title || selected.sources.length > 1) && (
+              <div className="live-meta">
+                {epg.now?.title && (
+                  <div>
+                    <small>{t("live.now")}</small>
+                    <strong>{epg.now.title}</strong>
+                  </div>
+                )}
+                {epg.next[0]?.title && (
+                  <div>
+                    <small>{t("live.next")}</small>
+                    <strong>{epg.next[0].title}</strong>
+                  </div>
+                )}
+                {selected.sources.length > 1 && (
+                  <div>
+                    <small>{t("live.health")}</small>
+                    <strong>{selected.sources.length} {t("live.tryAlternative")}</strong>
+                  </div>
+                )}
               </div>
-              <div>
-                <small>{t("live.next")}</small>
-                <strong>{epg.next[0]?.title ?? t("live.noPrograms")}</strong>
-              </div>
-              <div>
-                <small>{t("live.health")}</small>
-                <strong>{selected.sources.length} {t("live.tryAlternative")}</strong>
-              </div>
-            </div>
+            )}
 
             {selected.sources.length > 1 && (
               <div className="source-list">
