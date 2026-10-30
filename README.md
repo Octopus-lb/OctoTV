@@ -136,4 +136,4 @@ This repository does not deploy itself or provision Cloudflare resources. Cloudf
 
 ## License and attribution
 
-No project-wide open-source license is declared unless a `LICENSE` file is added. Respect the individual licenses and terms of third-party dependencies, metadata providers, artwork sources, channel directories, and media providers. TMDB/AniList/IPTV-org attribution does not imply endorsement or grant media rights.
+The project is distributed under the MIT License; see [`LICENSE`](LICENSE). Respect the individual licenses and terms of third-party dependencies, metadata providers, artwork sources, channel directories, and media providers. TMDB/AniList/IPTV-org attribution does not imply endorsement or grant media rights or media redistribution permission.
