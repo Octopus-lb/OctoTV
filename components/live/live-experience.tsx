@@ -48,6 +48,15 @@ function displayName(code: string, locale: Locale) {
   }
 }
 
+function isPlayableSource(url: string) {
+  if (typeof window === "undefined") return true;
+  try {
+    return window.location.protocol !== "https:" || new URL(url, window.location.href).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export function LiveExperience({
   locale,
   compact = false,
@@ -78,6 +87,12 @@ export function LiveExperience({
     countries: DEFAULT_COUNTRY_CODES,
     categories: DEFAULT_CATEGORIES,
   });
+  const playableSources = useMemo(
+    () => selected?.sources
+      .map((source, index) => ({ source, index }))
+      .filter(({ source }) => isPlayableSource(source.url)) ?? [],
+    [selected],
+  );
 
   useEffect(() => {
     try {
@@ -159,6 +174,15 @@ export function LiveExperience({
     const source = selected.sources[sourceIndex];
     if (!source) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- surface missing stream source
+      setPlayerError(t("live.channelUnavailable"));
+      return;
+    }
+    if (!isPlayableSource(source.url)) {
+      const secureAlternative = selected.sources.findIndex((candidate) => isPlayableSource(candidate.url));
+      if (secureAlternative >= 0) {
+        setSourceIndex(secureAlternative);
+        return;
+      }
       setPlayerError(t("live.channelUnavailable"));
       return;
     }
@@ -387,18 +411,18 @@ export function LiveExperience({
                     <strong>{epg.next[0].title}</strong>
                   </div>
                 )}
-                {selected.sources.length > 1 && (
+                {playableSources.length > 1 && (
                   <div>
                     <small>{t("live.health")}</small>
-                    <strong>{selected.sources.length} {t("live.tryAlternative")}</strong>
+                    <strong>{playableSources.length} {t("live.tryAlternative")}</strong>
                   </div>
                 )}
               </div>
             )}
 
-            {selected.sources.length > 1 && (
+            {playableSources.length > 1 && (
               <div className="source-list">
-                {selected.sources.map((source, index) => (
+                {playableSources.map(({ source, index }) => (
                   <button
                     key={`${source.url}-${index}`}
                     type="button"
