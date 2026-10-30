@@ -446,6 +446,12 @@ footer small { color: #55555d; }
   cursor: text;
   transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
 }
+.filter-bar > .search-field {
+  flex: 1 1 260px;
+  min-width: 220px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
 .search-field:hover, .search-field:focus-within {
   border-color: rgba(197,160,89,.58);
   background: #10100f;

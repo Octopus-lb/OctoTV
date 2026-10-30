@@ -32,13 +32,6 @@ export default async function LocaleHome({
     <main>
       <HeroShowcase items={home.featured} locale={locale} />
 
-      {home.degraded && (
-        <div className="demo-notice" role="status">
-          <span className="demo-pill">{t("common.demo")}</span>
-          {t("common.demoNotice")}
-        </div>
-      )}
-
       {continueWatching.length > 0 && (
         <section className="content-section overlap-section">
           <div className="section-heading">

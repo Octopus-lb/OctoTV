@@ -51,6 +51,7 @@ export type VideoPlayerProps = {
   title: string;
   episodeId?: string | null;
   options: PlaybackOption[];
+  trackProgress?: boolean;
   resumeSeconds?: number;
   nextHref?: string | null;
   nextLabel?: string | null;
@@ -63,6 +64,7 @@ export function VideoPlayer({
   title,
   episodeId,
   options,
+  trackProgress = false,
   resumeSeconds = 0,
   nextHref,
   nextLabel,
@@ -125,6 +127,7 @@ export function VideoPlayer({
 
   const reportProgress = useCallback(
     (force = false) => {
+      if (!trackProgress) return;
       const video = videoRef.current;
       if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
       const now = Date.now();
@@ -147,7 +150,7 @@ export function VideoPlayer({
         keepalive: true,
       }).catch(() => undefined);
     },
-    [contentId, episodeId],
+    [contentId, episodeId, trackProgress],
   );
 
   const tryFallbackServer = useCallback(() => {

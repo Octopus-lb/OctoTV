@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Bell,
   CircleUserRound,
@@ -51,6 +51,30 @@ export function SiteHeader({
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const languageButtonRef = useRef<HTMLButtonElement>(null);
+  const languagePopoverRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!langOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (languageButtonRef.current?.contains(target) || languagePopoverRef.current?.contains(target)) return;
+      setLangOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setLangOpen(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [langOpen]);
 
   const activePath = useMemo(() => {
     const parts = pathname.split("/").filter(Boolean);
@@ -101,6 +125,7 @@ export function SiteHeader({
           <Radio size={19} />
         </button>
         <button
+          ref={languageButtonRef}
           type="button"
           className="icon-btn lang-button"
           aria-label={`${localeShortNames[locale]} ${t("common.language")}`}
@@ -149,7 +174,7 @@ export function SiteHeader({
       </div>
 
       {langOpen && (
-        <div className="lang-popover" role="menu" aria-label={t("common.language")}>
+        <div ref={languagePopoverRef} className="lang-popover" role="menu" aria-label={t("common.language")}>
           {locales.map((item) => (
             <button
               key={item}

@@ -60,6 +60,7 @@ export default async function WatchPage({
         title={detail.title}
         episodeId={episode ?? null}
         options={options}
+        trackProgress={Boolean(viewer)}
         resumeSeconds={resumeSeconds}
         nextHref={
           nextEpisode
