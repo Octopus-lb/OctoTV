@@ -131,9 +131,13 @@ export function SiteHeader({
             )}
           </div>
         ) : (
-          <Link href={localePath(locale, "/auth/sign-in")} className="signin-btn">
-            <LogIn size={17} />
-            <span>{t("common.signIn")}</span>
+          <Link
+            href={localePath(locale, "/auth/sign-in")}
+            className="signin-btn signin-icon"
+            aria-label={t("common.signIn")}
+            title={t("common.signIn")}
+          >
+            <LogIn size={18} aria-hidden="true" />
           </Link>
         )}
 

@@ -5,6 +5,7 @@ import { I18nProvider } from "@/components/i18n-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MobileNav } from "@/components/mobile-nav";
+import { DisableContextMenu } from "@/components/disable-context-menu";
 import { getDirection, isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { createTranslator } from "@/lib/i18n";
 import { getSession, isAdminUser } from "@/lib/auth/server";
@@ -27,7 +28,7 @@ export async function generateMetadata({
       template: "%s · OctoTV",
     },
     description: t("home.footerTagline"),
-    icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+    icons: { icon: "/octotv-emblem.png", shortcut: "/octotv-emblem.png" },
     openGraph: {
       siteName: "OctoTV",
       title: "OctoTV",
@@ -58,6 +59,7 @@ export default async function LocaleLayout({
           {locale === "ar" ? "تخطَّ إلى المحتوى" : "Skip to content"}
         </a>
         <I18nProvider locale={locale}>
+          <DisableContextMenu />
           <SiteHeader
             locale={locale}
             user={
