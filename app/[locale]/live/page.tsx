@@ -22,7 +22,6 @@ export default async function LivePage({
           <span className="live-dot" /> {t("common.live")}
         </span>
         <h1>{t("live.title")}</h1>
-        <p>{t("live.subtitle")}</p>
         <p className="rights-note">{t("live.rightsNotice")}</p>
       </header>
       <LiveExperience locale={locale} />

@@ -268,11 +268,7 @@ export function LiveExperience({
             key={channel.id}
             role="button"
             tabIndex={0}
-            aria-label={`${channel.name} ${
-              [channel.country, channel.categories[0], channel.sources[0]?.quality]
-                .filter(Boolean)
-                .join(" · ") || t("common.live")
-            }`}
+            aria-labelledby={`channel-name-${encodeURIComponent(channel.id)} channel-meta-${encodeURIComponent(channel.id)}`}
             onClick={() => {
               setSourceIndex(0);
               setSelected(channel);
@@ -301,8 +297,8 @@ export function LiveExperience({
               )}
             </span>
             <span className="channel-copy">
-              <strong>{channel.name}</strong>
-              <small>
+              <strong id={`channel-name-${encodeURIComponent(channel.id)}`}>{channel.name}</strong>
+              <small id={`channel-meta-${encodeURIComponent(channel.id)}`}>
                 {[channel.country, channel.categories[0], channel.sources[0]?.quality]
                   .filter(Boolean)
                   .join(" · ") || t("common.live")}

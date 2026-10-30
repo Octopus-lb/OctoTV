@@ -112,7 +112,6 @@ export function SiteHeader({
           onClick={() => setLangOpen((open) => !open)}
         >
           <Globe2 size={18} />
-          <span>{localeShortNames[locale]}</span>
         </button>
 
         {user ? (

@@ -8,7 +8,6 @@ export function SiteFooter({ locale }: { locale: Locale }) {
   return (
     <footer>
       <Brand locale={locale} />
-      <p>{t("home.footerTagline")}</p>
       <div>
         <Link href={localePath(locale, "/movies")}>{t("common.movies")}</Link>
         <Link href={localePath(locale, "/shows")}>{t("common.shows")}</Link>
@@ -19,11 +18,8 @@ export function SiteFooter({ locale }: { locale: Locale }) {
         <Link href={localePath(locale, "/legal/privacy")}>{t("common.privacy")}</Link>
         <Link href={localePath(locale, "/legal/terms")}>{t("common.terms")}</Link>
         <Link href={localePath(locale, "/legal/dmca")}>{t("common.dmca")}</Link>
-        <Link href={localePath(locale, "/about/credits")}>{t("common.credits")}</Link>
       </div>
       <small>{t("home.copyright")}</small>
-      <small>{t("legal.tmdbAttribution")}</small>
-      <small>{t("legal.iptvAttribution")}</small>
     </footer>
   );
 }

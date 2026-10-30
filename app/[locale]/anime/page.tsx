@@ -26,7 +26,6 @@ export default async function AnimePage({
       <header className="page-intro">
         <span className="kicker">{t("common.anime")}</span>
         <h1>{t("catalog.animeTitle")}</h1>
-        <p>{t("catalog.animeSubtitle")}</p>
       </header>
       <CatalogBrowser
         locale={locale}

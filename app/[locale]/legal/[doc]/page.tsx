@@ -45,7 +45,6 @@ export default async function LegalPage({
         <Link href={localePath(locale, "/legal/terms")}>{t("common.terms")}</Link>
         <Link href={localePath(locale, "/legal/privacy")}>{t("common.privacy")}</Link>
         <Link href={localePath(locale, "/legal/dmca")}>{t("common.dmca")}</Link>
-        <Link href={localePath(locale, "/about/credits")}>{t("common.credits")}</Link>
       </nav>
     </main>
   );
