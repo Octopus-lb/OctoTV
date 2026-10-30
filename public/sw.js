@@ -1,4 +1,4 @@
-const CACHE_NAME = "octotv-static-v1";
+const CACHE_NAME = "octotv-static-v2";
 const PRECACHE_URLS = [
   "/offline.html",
   "/manifest.webmanifest",
