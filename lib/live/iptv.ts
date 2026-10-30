@@ -4,6 +4,18 @@ import type { ChannelFilters, LiveChannel, LiveSource } from "./types";
 
 export { filterChannels, parseM3U };
 
+export type ChannelFacets = {
+  countries: string[];
+  categories: string[];
+};
+
+function channelFacets(channels: LiveChannel[]): ChannelFacets {
+  return {
+    countries: [...new Set(channels.map((channel) => channel.country).filter((value): value is string => Boolean(value)))].sort(),
+    categories: [...new Set(channels.flatMap((channel) => channel.categories))].sort(),
+  };
+}
+
 const CHANNELS_API = "https://iptv-org.github.io/api/channels.json";
 const STREAMS_API = "https://iptv-org.github.io/api/streams.json";
 
@@ -91,7 +103,7 @@ export async function loadChannels(options: {
   filters: ChannelFilters;
   limit: number;
   offset: number;
-}): Promise<{ channels: LiveChannel[]; total: number; degraded: boolean }> {
+}): Promise<{ channels: LiveChannel[]; total: number; degraded: boolean; facets: ChannelFacets }> {
   const playlist = options.playlist ? PLAYLISTS[options.playlist] : null;
 
   if (playlist) {
@@ -113,6 +125,7 @@ export async function loadChannels(options: {
         channels: filtered.slice(options.offset, options.offset + options.limit),
         total: filtered.length,
         degraded: false,
+        facets: channelFacets(channels),
       };
     } catch {
       const filtered = filterChannels(fallbackChannels(), options.filters);
@@ -120,6 +133,7 @@ export async function loadChannels(options: {
         channels: filtered.slice(0, options.limit),
         total: filtered.length,
         degraded: true,
+        facets: channelFacets(fallbackChannels()),
       };
     }
   }
@@ -131,6 +145,7 @@ export async function loadChannels(options: {
       channels: filtered.slice(options.offset, options.offset + options.limit),
       total: filtered.length,
       degraded: false,
+      facets: channelFacets(channels),
     };
   } catch {
     const filtered = filterChannels(fallbackChannels(), options.filters);
@@ -138,6 +153,7 @@ export async function loadChannels(options: {
       channels: filtered.slice(0, options.limit),
       total: filtered.length,
       degraded: true,
+      facets: channelFacets(fallbackChannels()),
     };
   }
 }

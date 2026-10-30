@@ -39,7 +39,6 @@ export async function GET(request: Request) {
     offset: (page - 1) * limit,
     filters: {
       country: url.searchParams.get("country") ?? undefined,
-      language: url.searchParams.get("language") ?? undefined,
       category: url.searchParams.get("category") ?? undefined,
       query: url.searchParams.get("q") ?? undefined,
       blockedIds: await blockedIds(),
@@ -56,6 +55,7 @@ export async function GET(request: Request) {
       total: result.total,
       degraded: result.degraded,
       channels: result.channels,
+      facets: result.facets,
       updatedAt: new Date().toISOString(),
       rightsNotice:
         "Public availability of an IPTV playlist does not establish redistribution rights.",

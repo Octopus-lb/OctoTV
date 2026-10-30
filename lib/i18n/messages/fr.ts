@@ -219,7 +219,6 @@ export const fr: Messages = {
   "live.title": "TV en direct",
   "live.subtitle": "Chaînes publiques agrégées par IPTV-org, avec état des sources et EPG si disponible.",
   "live.allCountries": "Tous les pays",
-  "live.allLanguages": "Toutes les langues",
   "live.allCategories": "Toutes les catégories",
   "live.now": "Maintenant",
   "live.next": "Ensuite",

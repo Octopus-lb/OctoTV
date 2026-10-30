@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Info, ListPlus, Play, Sparkles, Star } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
@@ -50,7 +51,16 @@ export function HeroShowcase({
       onBlur={() => setPaused(false)}
     >
       {backdrop ? (
-        <img className="hero-backdrop" src={backdrop} alt="" aria-hidden="true" />
+        <Image
+          className="hero-backdrop"
+          src={backdrop}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="100vw"
+          priority
+          unoptimized
+        />
       ) : (
         <>
           <div className="hero-grid" />

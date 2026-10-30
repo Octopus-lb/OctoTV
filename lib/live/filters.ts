@@ -62,14 +62,6 @@ export function filterChannels(
       return false;
     }
     if (
-      filters.language &&
-      !channel.languages.some(
-        (language) => language.toLowerCase() === filters.language?.toLowerCase(),
-      )
-    ) {
-      return false;
-    }
-    if (
       filters.category &&
       !channel.categories.some(
         (category) => category.toLowerCase() === filters.category?.toLowerCase(),

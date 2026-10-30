@@ -20,7 +20,6 @@ export type LiveChannel = {
 
 export type ChannelFilters = {
   country?: string;
-  language?: string;
   category?: string;
   query?: string;
   includeNsfw?: boolean;

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Play } from "lucide-react";
 import { titlePoster } from "@/lib/catalog/images";
 import type { CatalogTitle } from "@/lib/catalog/types";
@@ -9,7 +10,7 @@ import { toneFor } from "@/lib/ui/tone";
  */
 export function PosterArt({
   title,
-  size = "w500",
+  size = "w342",
   priority = false,
   showTitle = true,
 }: {
@@ -20,25 +21,16 @@ export function PosterArt({
 }) {
   const src = titlePoster(title.posterPath, title.source, size);
   const tone = toneFor(title.id);
-  const srcSet =
-    src && title.source === "tmdb" && title.posterPath
-      ? [
-          `${titlePoster(title.posterPath, "tmdb", "w185")} 185w`,
-          `${titlePoster(title.posterPath, "tmdb", "w342")} 342w`,
-          `${titlePoster(title.posterPath, "tmdb", "w500")} 500w`,
-          `${titlePoster(title.posterPath, "tmdb", "w780")} 780w`,
-        ].join(", ")
-      : undefined;
-
   return (
     <span className={`poster poster-${tone}${src ? " has-image" : ""}`}>
       {src ? (
-        <img
+        <Image
           className="poster-img"
           src={src}
-          srcSet={srcSet}
           sizes="(max-width: 760px) 145px, (max-width: 1050px) 170px, 220px"
           alt={title.title}
+          fill
+          unoptimized
           loading={priority ? "eager" : "lazy"}
           decoding="async"
           referrerPolicy="no-referrer"

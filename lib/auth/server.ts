@@ -11,6 +11,7 @@ import {
   sessions,
   users,
   verifications,
+  rateLimits,
 } from "@/db/schema";
 import { isLocale, type Locale } from "@/lib/i18n/config";
 import { resetPasswordEmail, sendEmail, verificationEmail } from "./email";
@@ -20,6 +21,10 @@ const authSchema = {
   sessions,
   accounts,
   verifications,
+  rate_limit: rateLimits,
+  // Schema validation pluralizes model names when usePlural is enabled, while
+  // adapter CRUD addresses the configured singular modelName.
+  rate_limits: rateLimits,
 };
 
 let cachedAuth: ReturnType<typeof createAuthInstance> | null = null;
@@ -66,11 +71,13 @@ function createAuthInstance() {
       additionalFields: {
         preferredLocale: {
           type: "string",
+          input: true,
           required: false,
           defaultValue: "ar",
         },
         role: {
           type: "string",
+          input: false,
           required: false,
           defaultValue: "user",
         },
@@ -111,7 +118,7 @@ function createAuthInstance() {
       // Never merge accounts purely because email strings match. Better Auth
       // only links a social account when the signed-in user explicitly does so.
       accountLinking: {
-        enabled: true,
+        enabled: false,
         trustedProviders: [],
       },
     },
@@ -119,8 +126,18 @@ function createAuthInstance() {
       enabled: true,
       window: 60,
       max: 60,
+      storage: "database",
+      modelName: "rate_limit",
+      customRules: {
+        "/sign-in/email": { window: 60, max: 5 },
+        "/sign-up/email": { window: 3600, max: 5 },
+        "/forget-password": { window: 3600, max: 3 },
+        "/send-verification-email": { window: 3600, max: 3 },
+        "/reset-password": { window: 3600, max: 5 },
+      },
     },
     advanced: {
+      ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },
       useSecureCookies: baseURL.startsWith("https://"),
       defaultCookieAttributes: {
         httpOnly: true,
@@ -208,4 +225,3 @@ export async function requireAdmin(): Promise<{
   const session = await getSession();
   return { session, authorized: await isAdminUser(session?.user ?? null) };
 }
-

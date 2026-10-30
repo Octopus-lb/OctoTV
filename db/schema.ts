@@ -118,6 +118,16 @@ export const verifications = sqliteTable(
   (table) => [index("verifications_identifier_idx").on(table.identifier)],
 );
 
+/** Better Auth's D1-persisted request counters. */
+export const rateLimits = sqliteTable("rate_limits", {
+  // Better Auth's schema checker expects an id column, but its rate-limit
+  // adapter doesn't write one; keep it nullable for compatibility.
+  id: text("id"),
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  lastRequest: integer("last_request", { mode: "number" }).notNull(),
+});
+
 /* -------------------------------------------------------------------------- */
 /* Profiles and devices                                                       */
 /* -------------------------------------------------------------------------- */

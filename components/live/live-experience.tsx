@@ -2,6 +2,7 @@
 
 import Hls from "hls.js";
 import Link from "next/link";
+import Image from "next/image";
 import {
   AlertCircle,
   ChevronDown,
@@ -24,24 +25,23 @@ type ChannelResponse = {
   page: number;
   pageSize: number;
   degraded?: boolean;
+  facets?: { countries: string[]; categories: string[] };
 };
 
-const COUNTRY_CODES = [
+const DEFAULT_COUNTRY_CODES = [
   "SA", "AE", "EG", "MA", "DZ", "TN", "QA", "KW", "JO", "LB", "IQ", "SY", "YE", "OM", "BH", "PS",
   "US", "GB", "FR", "DE", "TR", "NL", "CA", "IT", "ES", "BR", "IN", "JP", "KR", "RU",
 ];
 
-const LANGUAGE_CODES = ["ara", "eng", "fra", "tur", "deu", "spa", "ita", "rus", "jpn", "kor", "hin", "nld"];
-
-const CATEGORIES = [
+const DEFAULT_CATEGORIES = [
   "news", "sports", "movies", "music", "kids", "documentary", "general",
   "entertainment", "culture", "education", "religious", "series", "lifestyle",
   "science", "business", "travel", "weather", "family",
 ];
 
-function displayName(code: string, type: "region" | "language", locale: Locale) {
+function displayName(code: string, locale: Locale) {
   try {
-    const names = new Intl.DisplayNames([locale], { type });
+    const names = new Intl.DisplayNames([locale], { type: "region" });
     return names.of(code) ?? code;
   } catch {
     return code;
@@ -62,7 +62,6 @@ export function LiveExperience({
   const [total, setTotal] = useState(initial?.total ?? 0);
   const [page, setPage] = useState(initial?.page ?? 1);
   const [country, setCountry] = useState("");
-  const [language, setLanguage] = useState("");
   const [category, setCategory] = useState("");
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(!initial);
@@ -75,6 +74,10 @@ export function LiveExperience({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [playerError, setPlayerError] = useState("");
+  const [facets, setFacets] = useState({
+    countries: DEFAULT_COUNTRY_CODES,
+    categories: DEFAULT_CATEGORIES,
+  });
 
   useEffect(() => {
     try {
@@ -92,7 +95,6 @@ export function LiveExperience({
       setError("");
       const params = new URLSearchParams({ page: String(nextPage), limit: compact ? "8" : "48" });
       if (country) params.set("country", country);
-      if (language) params.set("language", language);
       if (category) params.set("category", category);
       if (query.trim()) params.set("q", query.trim());
       if (compact) params.set("list", "arab");
@@ -104,13 +106,16 @@ export function LiveExperience({
         setChannels((current) => (append ? [...current, ...data.channels] : data.channels));
         setTotal(data.total);
         setPage(data.page);
+        if (data.facets) {
+          setFacets(data.facets);
+        }
       } catch (caught) {
         if ((caught as Error).name !== "AbortError") setError(t("common.loadFailed"));
       } finally {
         setLoading(false);
       }
     },
-    [category, compact, country, language, query, t],
+    [category, compact, country, query, t],
   );
 
   useEffect(() => {
@@ -214,20 +219,9 @@ export function LiveExperience({
             <span>{t("common.country")}</span>
             <select value={country} onChange={(event) => setCountry(event.target.value)}>
               <option value="">{t("live.allCountries")}</option>
-              {COUNTRY_CODES.map((code) => (
+              {facets.countries.map((code) => (
                 <option key={code} value={code}>
-                  {displayName(code, "region", locale)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>{t("common.language")}</span>
-            <select value={language} onChange={(event) => setLanguage(event.target.value)}>
-              <option value="">{t("live.allLanguages")}</option>
-              {LANGUAGE_CODES.map((code) => (
-                <option key={code} value={code}>
-                  {displayName(code, "language", locale)}
+                  {displayName(code, locale)}
                 </option>
               ))}
             </select>
@@ -236,7 +230,7 @@ export function LiveExperience({
             <span>{t("common.category")}</span>
             <select value={category} onChange={(event) => setCategory(event.target.value)}>
               <option value="">{t("live.allCategories")}</option>
-              {CATEGORIES.map((item) => (
+              {facets.categories.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -292,7 +286,16 @@ export function LiveExperience({
           >
             <span className="channel-logo">
               {channel.logo ? (
-                <img src={channel.logo} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
+                <Image
+                  src={channel.logo}
+                  alt=""
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                  unoptimized
+                />
               ) : (
                 <Tv size={24} />
               )}

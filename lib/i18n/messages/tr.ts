@@ -219,7 +219,6 @@ export const tr: Messages = {
   "live.title": "Canlı TV",
   "live.subtitle": "IPTV-org tarafından derlenen genel kanallar; kaynak sağlığı ve varsa EPG ile.",
   "live.allCountries": "Tüm ülkeler",
-  "live.allLanguages": "Tüm diller",
   "live.allCategories": "Tüm kategoriler",
   "live.now": "Şimdi",
   "live.next": "Sonra",

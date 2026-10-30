@@ -1,101 +1,139 @@
 # OctoTV
 
-An independent, multilingual streaming-platform foundation built with Next.js 16 / Vinext, React 19, TypeScript, Cloudflare Workers, D1, R2, Drizzle ORM, and HLS.js. The catalog metadata and playback media are separate systems: TMDB and AniList supply metadata, while playback is available only from demo streams or owner-authorized providers/assets.
+**An independent, multilingual streaming-platform foundation.** OctoTV brings together a media catalog, household profiles, watch activity, live-channel discovery, and a rights-aware playback layer in one self-hostable application.
+
+> OctoTV is not a content-licensing service. Public metadata or stream listings do not grant redistribution rights. Operators must verify and document the rights for every asset and territory before enabling playback.
+
+## Project at a glance
+
+- **Languages:** Arabic (RTL), English, Turkish, and French.
+- **Application:** Next.js App Router-compatible app powered by Vinext, React 19, and TypeScript.
+- **Runtime target:** Cloudflare Workers, with D1 for relational data and optional R2 storage.
+- **Authentication:** Better Auth with email/password, optional Google OAuth, verification, and password recovery.
+- **Catalog metadata:** TMDB and AniList integrations; metadata is separate from playable media.
+- **Playback:** HLS.js/native playback through demo or explicitly configured, owner-authorized providers.
+- **Live TV:** IPTV-org channel discovery, country/category filters, channel search, favorites, and EPG where available.
+
+## Capabilities
+
+- Browse movies, series, and anime; open title details and watch pages.
+- Create profiles and manage watch history, progress, watchlists, and custom lists.
+- Discover live channels by country or category, search by channel name, and save favorites.
+- Use localized interfaces, with right-to-left layout for Arabic.
+- Integrate playback providers only after configuring credentials and verifying current content rights.
+- Run locally without deploying or provisioning paid services.
 
 ## Architecture
 
 ```text
-Browser (/{locale}; ar RTL, en/tr/fr LTR)
+Browser (/{locale}; Arabic RTL, English/Turkish/French LTR)
         │
         ▼
 Vinext App Router on Cloudflare Workers
- ├── Better Auth ── email/password, OAuth, verification, sessions
- ├── Catalog service ── D1 cache/repository ← TMDB + AniList
- ├── Playback service ── authorized provider adapters → HLS.js/native player
- ├── Activity/profiles ── D1 (watch history, progress, lists, watchlist)
- └── Live TV ── IPTV-org metadata/source listings + EPG
+ ├── Better Auth ── sessions, email/password, optional OAuth
+ ├── Catalog ── TMDB + AniList metadata
+ ├── Profiles/activity ── D1 watch history, progress, lists, watchlists
+ ├── Playback ── rights-authorized providers → HLS.js/native player
+ └── Live TV ── IPTV-org listings + EPG where available
         │
-        ├── D1: Drizzle-managed application records
-        └── R2: optional, rights-cleared media/download assets
+        ├── D1: application records and authentication rate limits
+        └── R2: optional, owner-authorized storage
 ```
 
-Metadata, art, trailer references, media assets, and user accounts do not depend on a third-party streaming site. OctoTV does not crawl protected players, bypass DRM, proxy arbitrary video, or store browser `blob:` URLs. Public IPTV listings are not treated as redistribution rights; verify terms and jurisdiction before enabling sources.
+OctoTV does not crawl protected players, bypass DRM, proxy arbitrary video, or persist browser `blob:` URLs. Demo streams are for player development only and must not be treated as production content rights.
 
-## Requirements and local setup
+## Requirements
 
 - Node.js `>=22.13.0`
-- pnpm `11.25.0` (via Corepack)
+- pnpm `11.25.0` (the version declared by `package.json`)
+- Git
 
-```powershell
+## Run locally
+
+```bash
 corepack enable
 corepack prepare pnpm@11.25.0 --activate
-cd D:\OctoTV
 pnpm install
-Copy-Item .env.example .dev.vars
 ```
 
-Set a fresh random `BETTER_AUTH_SECRET` in `.dev.vars` before using authentication. Keep `.dev.vars` local; it is ignored by Git. Then:
+Create local Worker variables from the blank template and set a fresh authentication secret:
 
-```powershell
-pnpm db:generate
+```bash
+cp .env.example .dev.vars
+```
+
+On Windows PowerShell, use `Copy-Item .env.example .dev.vars` instead. Generate a random secret with:
+
+```bash
+node -e "console.log(crypto.randomUUID()+crypto.randomUUID())"
+```
+
+Put the generated value in `.dev.vars` as `BETTER_AUTH_SECRET`. `.dev.vars` is ignored by Git; never commit real credentials.
+
+Apply the local D1 migrations and start the development server:
+
+```bash
 pnpm exec wrangler d1 migrations apply octotv-db --local --config wrangler.d1.jsonc --persist-to .wrangler/state
 pnpm dev
 ```
 
-Open `http://localhost:5173`. The local D1 migration has already been applied for this checkout. The `.dev.vars` file contains a locally generated secret; replace it before using this directory on another machine. No provider credentials, paid accounts, or production deployment are included.
+Open <http://localhost:5173>. Local D1 state is stored under `.wrangler/`. No OAuth provider, email service, paid resource, or production deployment is required for the basic local preview.
 
-TMDB works when `TMDB_READ_ACCESS_TOKEN` is configured; AniList's public GraphQL endpoint needs no key. Without TMDB credentials or seeded catalog records, the app falls back to clearly identified demo catalog data. Demo playback uses public player test streams solely to verify player behavior. Production playback needs owner-authorized provider credentials and registered, licensed playback assets.
+## Configuration
 
-## Environment and providers
+See [`.env.example`](.env.example) for the complete blank template. Configure values only when you intend to use the related integration.
 
-See [`.env.example`](.env.example) for the full blank template. Important settings:
-
-| Variable | Purpose |
+| Setting | Purpose |
 | --- | --- |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_BASE_URL` | Sessions, signing, and canonical app links |
-| `TMDB_READ_ACCESS_TOKEN` | Server-side TMDB metadata only |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional Google OAuth |
-| `RESEND_API_KEY`, `EMAIL_FROM` | Verification/reset email delivery |
-| `PLAYBACK_PROVIDER` and provider-specific keys | Owner-configured Mux, Cloudflare Stream, Bunny, or private library integrations |
-| `IPTV_PLAYLIST_URL` | Optional IPTV-org playlist source; default listing is metadata, not a rights grant |
+| `BETTER_AUTH_SECRET` | Session and authentication signing secret; required for auth. |
+| `BETTER_AUTH_URL`, `APP_BASE_URL` | Canonical application/authentication URLs. |
+| `TMDB_READ_ACCESS_TOKEN` | Server-side TMDB catalog metadata. |
+| `ANILIST_GRAPHQL_URL` | AniList GraphQL endpoint; public endpoint is the default. |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional Google OAuth credentials. |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Verification and password-recovery email delivery. |
+| `PLAYBACK_PROVIDER` and provider-specific settings | Select an owner-authorized playback integration. |
+| `IPTV_PLAYLIST_URL` | Optional live-channel playlist source. Listings are not a rights grant. |
+| `R2_*` | Optional object storage/download configuration. |
 
-Do not put provider secrets in client code. Download access requires verified rights and a short-lived signed URL. Do not create paid provider accounts or deploy without explicit owner approval.
+Provider secrets belong in local `.dev.vars` or the platform's secret manager—not in client code, source control, URLs, or logs. Do not create paid accounts or deploy without explicit authorization.
 
-## Database
+## Database and migrations
 
-The Drizzle schema lives in [`db/schema.ts`](db/schema.ts); generated SQL migrations are in [`drizzle/`](drizzle/). After schema edits:
+The Drizzle schema is in [`db/schema.ts`](db/schema.ts); SQL migrations and snapshots are in [`drizzle/`](drizzle/).
 
-```powershell
+After changing the schema:
+
+```bash
 pnpm db:generate
 pnpm exec wrangler d1 migrations apply octotv-db --local --config wrangler.d1.jsonc --persist-to .wrangler/state
 ```
 
-Production migrations are not run automatically. Configure a real D1 database ID and apply reviewed migrations as a separate, authorized release step. R2 is optional for local development and production; this project does not provision buckets.
+Production migrations are deliberately not automatic. Review each migration, select the correct database, and obtain owner approval before applying it remotely. Backups, retention, and restore guidance are documented in [`docs/security-operations.md`](docs/security-operations.md).
 
 ## Quality checks
 
-```powershell
+```bash
 pnpm typecheck
 pnpm lint
 pnpm test
 pnpm build
 ```
 
-The Node-native test suite covers locale dictionary parity, playback-token signing/tampering/expiry, authorized server selection and fallback rules, quality filtering, M3U parsing, NSFW exclusion, and channel blocklists. Lint currently reports only the framework's `<img>` performance advisories; no lint errors.
+The test suite covers locale dictionary parity, same-origin request checks, playback token integrity and authorization, source selection, channel parsing/filtering, and safe channel exclusions.
 
-## Deployment and operating cost
+## Rights, privacy, and operations
 
-Deployment is intentionally not performed from this repository session. A Cloudflare Workers + D1 + R2 deployment is a reasonable target, but actual monthly spend depends on current plan allowances, requests, database reads/writes, stored media, and video delivery. Video bandwidth/storage is likely the dominant variable cost; evaluate each media provider's current pricing, egress policy, and licensing terms before choosing one.
+- Public availability is not permission to rebroadcast. Confirm source terms and current licenses for the relevant territories, devices, and playback/download modes.
+- Do not enable production playback without documented rights and expiry handling for each asset.
+- Configure backups, retention/deletion rules, monitoring, incident ownership, email/OAuth credentials, and applicable legal notices before launch.
+- The repository's legal and operations notes are implementation placeholders, not legal advice or a certification of compliance.
 
-- [Cloudflare Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
-- [Cloudflare D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/)
-- [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/)
-- [Mux pricing](https://www.mux.com/pricing)
-- [Cloudflare Stream pricing](https://developers.cloudflare.com/stream/pricing/)
-- [Bunny Stream pricing](https://bunny.net/pricing/stream/)
+See [`docs/security-operations.md`](docs/security-operations.md) for the production-readiness checklist and [`docs/reports/`](docs/reports/) for implementation and QA reports.
 
-Review current vendor pricing rather than relying on a static estimate. Before a launch, configure production secrets, authorized content and rights windows, verified email/OAuth redirect URLs, backups/retention, rate limits, monitoring, and applicable legal/privacy notices.
+## Deployment
 
-## Project reports
+This repository does not deploy itself or provision Cloudflare resources. Cloudflare Workers, D1, R2, and video services may incur costs; review current vendor plans, egress policies, and licensing terms before choosing a production setup. Deployment is a separate, owner-approved release action.
 
-Implementation status and verification notes are tracked under [`docs/reports/`](docs/reports/). The original project brief and requirements are retained in [`CODEX_HANDOFF_AR.md`](CODEX_HANDOFF_AR.md).
+## License and attribution
+
+No project-wide open-source license is declared unless a `LICENSE` file is added. Respect the individual licenses and terms of third-party dependencies, metadata providers, artwork sources, channel directories, and media providers. TMDB/AniList/IPTV-org attribution does not imply endorsement or grant media rights.

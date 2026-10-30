@@ -10,6 +10,7 @@ import { isPlaybackAssetAuthorized } from "../lib/playback/authorization.ts";
 import { signToken, verifyToken } from "../lib/playback/token.ts";
 import { filterQualities, selectServer } from "../lib/playback/types.ts";
 import type { PlaybackOption } from "../lib/playback/types.ts";
+import { isSameOriginRequest } from "../lib/security/origin.ts";
 
 test("all supported locale dictionaries have the same complete keys", () => {
   const expected = Object.keys(en).sort();
@@ -17,6 +18,25 @@ test("all supported locale dictionaries have the same complete keys", () => {
     assert.deepEqual(Object.keys(messages).sort(), expected, `${locale} dictionary differs`);
     assert.ok(Object.values(messages).every((message) => typeof message === "string"));
   }
+});
+
+test("write request origin checks reject missing, null, and foreign origins", () => {
+  const sameOrigin = new Request("https://octotv.example/api/progress", {
+    method: "POST",
+    headers: { Origin: "https://octotv.example" },
+  });
+  const foreignOrigin = new Request("https://octotv.example/api/progress", {
+    method: "POST",
+    headers: { Origin: "https://attacker.example" },
+  });
+  const nullOrigin = new Request("https://octotv.example/api/progress", {
+    method: "POST",
+    headers: { Origin: "null" },
+  });
+  assert.equal(isSameOriginRequest(sameOrigin), true);
+  assert.equal(isSameOriginRequest(foreignOrigin), false);
+  assert.equal(isSameOriginRequest(nullOrigin), false);
+  assert.equal(isSameOriginRequest(new Request("https://octotv.example/api/progress", { method: "POST" })), false);
 });
 
 test("signed playback tokens validate, reject tampering, and expire", async () => {
@@ -122,4 +142,22 @@ test("channel filters always exclude NSFW and blocked sources by default", () =>
   const channels = [channel("safe", false, "Arab News"), channel("adult", true, "Arab Adult")];
   assert.deepEqual(filterChannels(channels, { country: "SA", query: "arab" }).map((item) => item.id), ["safe"]);
   assert.deepEqual(filterChannels(channels, { includeNsfw: true, blockedIds: new Set(["safe"]) }).map((item) => item.id), ["adult"]);
+});
+
+test("channel country and category filters match normalized metadata", () => {
+  const channel: LiveChannel = {
+    id: "regional-news",
+    name: "Regional News",
+    altNames: [],
+    country: "TR",
+    languages: ["tur"],
+    categories: ["news", "culture"],
+    logo: null,
+    website: null,
+    isNsfw: false,
+    sources: [{ url: "https://stream.example/news.m3u8", quality: null, label: null }],
+    sourceCount: 1,
+  };
+  assert.deepEqual(filterChannels([channel], { country: "tr" }).map((item) => item.id), ["regional-news"]);
+  assert.deepEqual(filterChannels([channel], { category: "culture" }).map((item) => item.id), ["regional-news"]);
 });

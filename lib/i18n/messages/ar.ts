@@ -219,7 +219,6 @@ export const ar: Messages = {
   "live.title": "البث المباشر",
   "live.subtitle": "قنوات عامة مجمّعة من IPTV-org مع حالة المصادر ودليل البرامج عند توفره.",
   "live.allCountries": "كل الدول",
-  "live.allLanguages": "كل اللغات",
   "live.allCategories": "كل الفئات",
   "live.now": "الآن",
   "live.next": "التالي",

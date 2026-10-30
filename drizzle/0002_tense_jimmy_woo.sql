@@ -1,0 +1,1 @@
+ALTER TABLE `rate_limits` ADD `id` text;

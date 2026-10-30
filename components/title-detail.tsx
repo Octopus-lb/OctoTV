@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   CalendarDays,
   Clock3,
@@ -174,7 +175,15 @@ export function TitleDetailView({
                   <li key={member.id}>
                     <span className="cast-avatar">
                       {image ? (
-                        <img src={image} alt="" loading="lazy" decoding="async" />
+                        <Image
+                          src={image}
+                          alt=""
+                          width={40}
+                          height={40}
+                          loading="lazy"
+                          decoding="async"
+                          unoptimized
+                        />
                       ) : (
                         member.name.slice(0, 1)
                       )}

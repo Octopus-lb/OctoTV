@@ -217,7 +217,6 @@ export const en = {
   "live.title": "Live TV",
   "live.subtitle": "Public channels aggregated by IPTV-org, with source health and EPG when available.",
   "live.allCountries": "All countries",
-  "live.allLanguages": "All languages",
   "live.allCategories": "All categories",
   "live.now": "Now",
   "live.next": "Next",

@@ -433,6 +433,7 @@ footer small { color: #55555d; }
   outline: 0;
 }
 .filter-bar select:focus, .filter-bar input:focus { border-color: rgba(255,53,77,.55); }
+.filter-bar select:disabled { opacity: .6; cursor: not-allowed; }
 .search-field {
   display: flex !important;
   align-items: center;

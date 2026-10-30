@@ -8,18 +8,18 @@ type EmailPayload = {
 };
 
 /**
- * Sends transactional email through Resend when configured.
- * In development the message is logged so the verification flow can be tested
- * without a paid provider. No email credentials are ever sent to the client.
+ * Sends transactional email through Resend when configured. Verification and
+ * password-reset links are secrets and are never written to application logs.
  */
 export async function sendEmail(payload: EmailPayload): Promise<void> {
   const apiKey = cloudflareEnv.RESEND_API_KEY;
   const from = cloudflareEnv.EMAIL_FROM || "OctoTV <no-reply@octotv.local>";
 
   if (!apiKey) {
-    console.info(
-      `[octotv:email] RESEND_API_KEY is not configured. Message for ${payload.to}: ${payload.subject}\n${payload.text}`,
-    );
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Transactional email is not configured.");
+    }
+    console.info("[octotv:email] Email provider is not configured; message was not sent.");
     return;
   }
 
@@ -39,8 +39,7 @@ export async function sendEmail(payload: EmailPayload): Promise<void> {
   });
 
   if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`Resend responded ${response.status}: ${detail.slice(0, 200)}`);
+    throw new Error(`Transactional email provider returned HTTP ${response.status}.`);
   }
 }
 

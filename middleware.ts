@@ -6,6 +6,7 @@ import {
   resolveLocaleFromAcceptLanguage,
   type Locale,
 } from "@/lib/i18n/config";
+import { isSameOriginRequest } from "@/lib/security/origin";
 
 const PUBLIC_FILE = /\.(?:svg|png|jpg|jpeg|gif|webp|ico|txt|xml|webmanifest|js|css|map|woff2?)$/i;
 
@@ -21,8 +22,17 @@ function detectLocale(request: NextRequest): Locale {
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  if (pathname.startsWith("/api")) {
+    if (
+      ["POST", "PUT", "PATCH", "DELETE"].includes(request.method) &&
+      !isSameOriginRequest(request)
+    ) {
+      return NextResponse.json({ error: "cross_origin_request_denied" }, { status: 403 });
+    }
+    return NextResponse.next();
+  }
+
   if (
-    pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/__") ||
     PUBLIC_FILE.test(pathname)
@@ -60,5 +70,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };
