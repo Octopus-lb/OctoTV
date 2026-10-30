@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import "../globals.css";
 import { I18nProvider } from "@/components/i18n-provider";
@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { MobileNav } from "@/components/mobile-nav";
 import { DisableContextMenu } from "@/components/disable-context-menu";
+import { PwaExperience } from "@/components/pwa-experience";
 import { getDirection, isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { createTranslator } from "@/lib/i18n";
 import { getSession, isAdminUser } from "@/lib/auth/server";
@@ -13,6 +14,13 @@ import { getSession, isAdminUser } from "@/lib/auth/server";
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#050505",
+  colorScheme: "dark",
+};
 
 export async function generateMetadata({
   params,
@@ -28,7 +36,20 @@ export async function generateMetadata({
       template: "%s · OctoTV",
     },
     description: t("home.footerTagline"),
-    icons: { icon: "/octotv-emblem.png", shortcut: "/octotv-emblem.png" },
+    icons: {
+      icon: [
+        { url: "/octotv-icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/octotv-icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      shortcut: "/octotv-icon-192.png",
+      apple: "/octotv-icon-192.png",
+    },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: "OctoTV",
+    },
     openGraph: {
       siteName: "OctoTV",
       title: "OctoTV",
@@ -60,6 +81,7 @@ export default async function LocaleLayout({
         </a>
         <I18nProvider locale={locale}>
           <DisableContextMenu />
+          <PwaExperience />
           <SiteHeader
             locale={locale}
             user={

@@ -83,6 +83,10 @@ export const fr: Messages = {
   "home.liveNow": "En direct",
   "home.liveSubtitle": "Chaînes publiques agrégées par IPTV-org. La disponibilité dépend du pays et de la source.",
   "home.footerTagline": "Une interface de streaming moderne pour du contenu sous licence et les chaînes publiques IPTV-org.",
+  "pwa.installTitle": "Emportez OctoTV avec vous",
+  "pwa.installDescription": "Installez l’application pour une expérience plein écran plus rapide.",
+  "pwa.installAction": "Installer l’application",
+  "pwa.dismiss": "Plus tard",
   "home.copyright": "© 2026 OctoTV. Aperçu privé.",
   "home.stat.everyone": "{count} titres",
 

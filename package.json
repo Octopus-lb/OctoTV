@@ -9,6 +9,7 @@
     "dev": "vinext dev --port 5173",
     "build": "vinext build",
     "start": "wrangler dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
+    "deploy:cloudflare": "node scripts/deploy-cloudflare.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/*.test.ts",

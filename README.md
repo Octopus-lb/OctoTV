@@ -1,5 +1,7 @@
 # OctoTV
 
+For production deployment, use Cloudflare Workers. See [Cloudflare deployment](docs/deploy-cloudflare.md) for the required existing D1/R2 bindings and deployment command. This Vinext project is not configured for Vercel's Next.js build adapter.
+
 **An independent, multilingual streaming-platform foundation.** OctoTV brings together a media catalog, household profiles, watch activity, live-channel discovery, and a rights-aware playback layer in one self-hostable application.
 
 > OctoTV is not a content-licensing service. Public metadata or stream listings do not grant redistribution rights. Operators must verify and document the rights for every asset and territory before enabling playback.

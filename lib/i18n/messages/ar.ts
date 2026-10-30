@@ -83,6 +83,10 @@ export const ar: Messages = {
   "home.liveNow": "مباشر الآن",
   "home.liveSubtitle": "قنوات عامة مجمّعة من IPTV-org. يتوقف التوفر على الدولة والمصدر.",
   "home.footerTagline": "واجهة بث حديثة للمحتوى المرخّص وقنوات IPTV-org العامة.",
+  "pwa.installTitle": "اصطحب OctoTV معك",
+  "pwa.installDescription": "ثبّت التطبيق لتجربة أسرع وبملء الشاشة.",
+  "pwa.installAction": "تثبيت التطبيق",
+  "pwa.dismiss": "ليس الآن",
   "home.copyright": "© 2026 OctoTV. نسخة تجريبية خاصة.",
   "home.stat.everyone": "{count} عنوانًا",
 

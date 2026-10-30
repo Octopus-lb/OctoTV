@@ -81,6 +81,10 @@ export const en = {
   "home.liveNow": "Live now",
   "home.liveSubtitle": "Public channels aggregated by IPTV-org. Availability depends on country and source.",
   "home.footerTagline": "A modern streaming front end for licensed content and public IPTV-org channels.",
+  "pwa.installTitle": "Take OctoTV with you",
+  "pwa.installDescription": "Install the app for a faster, full-screen experience.",
+  "pwa.installAction": "Install app",
+  "pwa.dismiss": "Not now",
   "home.copyright": "© 2026 OctoTV. Private preview.",
   "home.stat.everyone": "{count} titles",
 

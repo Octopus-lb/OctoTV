@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050505" />
+    <title>OctoTV · Offline</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background: #050505; color: #eee; }
+      * { box-sizing: border-box; }
+      body { min-height: 100svh; margin: 0; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 50% 35%, #18130a 0, #050505 55%); }
+      main { width: min(100%, 420px); text-align: center; }
+      img { width: 112px; height: 112px; object-fit: contain; margin-bottom: 20px; }
+      p { color: #aaa; line-height: 1.8; }
+      button { min-height: 46px; margin-top: 14px; padding: 0 22px; border: 0; border-radius: 10px; background: #c5a059; color: #090909; font: inherit; font-weight: 700; cursor: pointer; }
+      button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+      [dir="rtl"] { font-family: "Noto Kufi Arabic", system-ui, sans-serif; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/octotv-icon-192.png" alt="OctoTV" />
+      <h1 id="title">You’re offline</h1>
+      <p id="message">Check your internet connection and try again. Your private account and playback data are never stored for offline use.</p>
+      <button id="retry" type="button">Try again</button>
+    </main>
+    <script>
+      const copy = {
+        ar: ["لا يوجد اتصال بالإنترنت", "تحقق من اتصالك بالإنترنت ثم حاول مجددًا. لا نحفظ بيانات حسابك أو تشغيلك للاستخدام دون اتصال.", "إعادة المحاولة"],
+        en: ["You’re offline", "Check your internet connection and try again. Your private account and playback data are never stored for offline use.", "Try again"],
+        fr: ["Vous êtes hors ligne", "Vérifiez votre connexion Internet puis réessayez. Vos données privées ne sont jamais stockées hors ligne.", "Réessayer"],
+        tr: ["Çevrim dışısınız", "İnternet bağlantınızı kontrol edip tekrar deneyin. Özel hesap ve oynatma verileriniz çevrim dışı kullanım için saklanmaz.", "Tekrar dene"]
+      };
+      const lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+      const locale = copy[lang] ? lang : "en";
+      const [title, message, retry] = copy[locale];
+      document.documentElement.lang = locale;
+      document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
+      document.title = `OctoTV · ${title}`;
+      document.querySelector("#title").textContent = title;
+      document.querySelector("#message").textContent = message;
+      document.querySelector("#retry").textContent = retry;
+      document.querySelector("#retry").addEventListener("click", () => location.reload());
+    </script>
+  </body>
+</html>

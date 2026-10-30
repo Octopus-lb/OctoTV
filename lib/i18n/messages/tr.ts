@@ -83,6 +83,10 @@ export const tr: Messages = {
   "home.liveNow": "Şimdi canlı",
   "home.liveSubtitle": "IPTV-org tarafından derlenen genel kanallar. Erişilebilirlik ülkeye ve kaynağa bağlıdır.",
   "home.footerTagline": "Lisanslı içerik ve genel IPTV-org kanalları için modern bir yayın arayüzü.",
+  "pwa.installTitle": "OctoTV’yi yanında taşı",
+  "pwa.installDescription": "Daha hızlı ve tam ekran bir deneyim için uygulamayı yükle.",
+  "pwa.installAction": "Uygulamayı yükle",
+  "pwa.dismiss": "Şimdi değil",
   "home.copyright": "© 2026 OctoTV. Özel önizleme.",
   "home.stat.everyone": "{count} başlık",
 
