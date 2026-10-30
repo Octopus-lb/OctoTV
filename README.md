@@ -1,133 +1,101 @@
-# vinext-starter
+# OctoTV
 
-A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
+An independent, multilingual streaming-platform foundation built with Next.js 16 / Vinext, React 19, TypeScript, Cloudflare Workers, D1, R2, Drizzle ORM, and HLS.js. The catalog metadata and playback media are separate systems: TMDB and AniList supply metadata, while playback is available only from demo streams or owner-authorized providers/assets.
 
-## Prerequisites
+## Architecture
+
+```text
+Browser (/{locale}; ar RTL, en/tr/fr LTR)
+        │
+        ▼
+Vinext App Router on Cloudflare Workers
+ ├── Better Auth ── email/password, OAuth, verification, sessions
+ ├── Catalog service ── D1 cache/repository ← TMDB + AniList
+ ├── Playback service ── authorized provider adapters → HLS.js/native player
+ ├── Activity/profiles ── D1 (watch history, progress, lists, watchlist)
+ └── Live TV ── IPTV-org metadata/source listings + EPG
+        │
+        ├── D1: Drizzle-managed application records
+        └── R2: optional, rights-cleared media/download assets
+```
+
+Metadata, art, trailer references, media assets, and user accounts do not depend on a third-party streaming site. OctoTV does not crawl protected players, bypass DRM, proxy arbitrary video, or store browser `blob:` URLs. Public IPTV listings are not treated as redistribution rights; verify terms and jurisdiction before enabling sources.
+
+## Requirements and local setup
 
 - Node.js `>=22.13.0`
-- Portable: Windows, macOS, or Linux; no Bash required
-- Managed Linux: managed Linux runtime with Bash, `flock`, `curl`, `sha256sum`, and GNU `timeout`
-- Git and `tar` (including Windows `tar.exe`) are required for publishing; portable publication does not require Bash
+- pnpm `11.25.0` (via Corepack)
 
-## Sites Lifecycle
-
-The Sites initializer copies the shared starter and selects managed-linux only when `SITES_MANAGED_LINUX_CONTAINER=1`; otherwise it selects portable. It saves the selection only in ignored `.sites-runtime/execution-profile.json`. Both profiles copy/configure first, then use the plugin's separate `install-dependencies.mjs` step to measure installation independently. Edit source under `app/` and follow the Sites skill for installation, preview, builds, and publishing.
-
-Run `node <plugin-root>/scripts/configure-execution-profile.mjs` only when the profile is unknown for the current checkout and environment. Profile changes do not alter tracked source or require reinstalling otherwise-valid dependencies; restart an existing preview to use the new selection. Do not commit or upload `.sites-runtime/`.
-
-This starter does not use `wrangler.jsonc`.
-
-Publish archives outside the source checkout or under its ignored `outputs/` directory. Local `.env*`, `.dev.vars*`, TypeScript build state, and tool runtime directories are ignored; keep the hosting manifest, migrations, and authored scripts in source control.
-
-`install:ci` runs `npm ci` once against the shared lockfile, disables parent-workspace discovery, and includes required dev/optional dependencies despite production/omit settings. Sharp defaults to prebuilt binaries unless explicitly configured otherwise. Do not overlap installers.
-
-- **Portable:** Preserve host HOME, npm cache, registry, proxy, temporary paths, retry/concurrency settings, and lifecycle-script policy. Use `--prefer-offline --no-audit --no-fund`.
-- **Managed Linux:** Use the existing project-local HOME/cache/tmp setup and Linux install lock, tarball preflight, and timeout. Restore the image-seeded npm cache only when its lockfile hash matches; retain network fallback. Builds keep their existing timeout. These helpers are not invoked by the portable profile.
-
-`scripts/sites-env.mjs` preserves the caller's HOME, npm cache, proxy, XDG, and temporary-directory configuration while defaulting Wrangler and Miniflare state to the checkout. If npm reports an unwritable cache, select a writable path with `npm_config_cache` for that install. The `dev` and `start` scripts also keep Wrangler logs inside the checkout. Generated `.sites-runtime/` and `.wrangler/` directories are disposable and ignored by Git.
-
-On portable, `npm run dev` uses `vinext dev` with HMR, starting at port 5173. Vinext records the running server in ignored `.vinext/` state, rejects an ordinary duplicate launch, and recovers stale state after a stopped process; exactly simultaneous starts can race. Pass `--port <port>` or `--hostname <host>` after `npm run dev --` when needed; keep portable previews on loopback.
-
-For managed Linux browser QA, follow the Sites skill's managed preview reference. The daemon runs the project's Vite dev script with `--host 0.0.0.0 --port 4173 --strictPort`; use the CLI's returned URL. The ignored local profile survives the daemon's cleared environment.
-
-The portable profile simulates ChatGPT sign-in only for loopback development requests. Visit `/signin-with-chatgpt?return_to=/` to sign in as `local_seedy` (`seedy@sites.test`, display name `Seedy`) and `/signout-with-chatgpt?return_to=/` to sign out. The development cookie preserves that identity across server restarts. Mock auth is disabled in the managed-linux profile and is not included in production builds; hosted authentication remains dispatch-owned.
-
-The Worker uses `vinext/server/fetch-handler`, including Vinext's config-aware image handling. After building, `npm start` runs that Worker locally through Wrangler on `127.0.0.1`, sharing `.wrangler/state` with dev preview and local D1 migrations; it does not deploy the site or simulate sign-in. Use the URL printed by the server. Pass `npm start -- --port <port>` to select a different built-preview port.
-
-Local previews use Miniflare's placeholder `Request.cf` metadata without a network lookup. Set `CLOUDFLARE_CF_FETCH_ENABLED=true` to opt into fetching preview metadata; this setting does not change hosted request metadata.
-
-Local tool usage metrics are disabled by default. Set `WRANGLER_SEND_METRICS=true` to opt in.
-
-## Included Shape
-
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `worker/index.ts` is the production Worker entrypoint and preserves request-scoped connector bindings
-- `scripts/vite/` contains the maintained Vite integrations and the vendored Sites plugin license
-- `scripts/connector-preview/` contains the local connector preview Worker and session helpers
-- the remaining `scripts/` files select execution profiles and run installation, development, and builds; the plugin's helpers orchestrate the Sites lifecycle
-- `dist/` contains generated deployment output; `.vinext/`, `.wrangler/`, and `.sites-runtime/` contain ignored local tool state
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `@cloudflare/workers-types` provides Worker types; `cloudflare-env.d.ts` declares optional `DB`/`BUCKET` bindings—update these declarations if binding names change
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
-
-The user ID is stable for the same user on the same Site and different across Sites. Use it as the durable user key; use email and name for display or contact purposes.
-
-SIWC-authenticated workspace sites may also receive `oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty `name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by `oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```powershell
+corepack enable
+corepack prepare pnpm@11.25.0 --activate
+cd D:\OctoTV
+pnpm install
+Copy-Item .env.example .dev.vars
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Set a fresh random `BETTER_AUTH_SECRET` in `.dev.vars` before using authentication. Keep `.dev.vars` local; it is ignored by Git. Then:
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use the returned `userId` as the stable user key for user-owned records; do not use email as a durable identifier.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send anonymous visitors through Sign in with ChatGPT.
-- In a Server Component, start sign-in with `<a href={chatGPTSignInPath(returnTo)} target="_top">`. The auth helper module is server-only; do not import it into a Client Component.
-- Do not use `fetch`, XHR, a client-side router, or a framework link that can prefetch the sign-in route. SIWC must start as a top-level navigation.
-- Never request the AuthAPI authorization endpoint directly. The dispatch-owned `/signin-with-chatgpt` route must start the SIWC flow.
-- Use `chatGPTSignOutPath(returnTo)` for browser sign-out links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the OAuth cookies, and identity header injection. Do not implement app routes for those reserved paths. Routes that do not import and call the helper remain anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the Sites hosting platform's access policy controls for workspace-wide restrictions, or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Local D1 migrations
-
-For a D1-backed local preview, generate SQL with `npm run db:generate`. Build once through the Sites skill's build entrypoint (or `npm run build` for standalone use) to generate `dist/server/wrangler.json`, rebuilding if bindings change. From the project root, apply each pending migration in order:
-
-```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_example.sql
+```powershell
+pnpm db:generate
+pnpm exec wrangler d1 migrations apply octotv-db --local --config wrangler.d1.jsonc --persist-to .wrangler/state
+pnpm dev
 ```
 
-Replace the filename with the pending migration and `DB` with your D1 binding name if different. Use `.wrangler/state`, not `.wrangler/state/v3`; Wrangler adds the versioned directories. Do not replay migrations already applied locally. This updates only the preview database; publishing applies production migrations separately.
+Open `http://localhost:5173`. The local D1 migration has already been applied for this checkout. The `.dev.vars` file contains a locally generated secret; replace it before using this directory on another machine. No provider credentials, paid accounts, or production deployment are included.
 
-## Diagnostic Commands
+TMDB works when `TMDB_READ_ACCESS_TOKEN` is configured; AniList's public GraphQL endpoint needs no key. Without TMDB credentials or seeded catalog records, the app falls back to clearly identified demo catalog data. Demo playback uses public player test streams solely to verify player behavior. Production playback needs owner-authorized provider credentials and registered, licensed playback assets.
 
-- `npm run install:ci`: perform the one locked dependency install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build the deployable Sites artifact
-- `npm run start`: preview the built Worker locally with D1/R2 support
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## Environment and providers
 
-When using the Sites plugin, follow its skill instructions for installation, builds, and publishing. These npm commands remain available for standalone use.
+See [`.env.example`](.env.example) for the full blank template. Important settings:
 
-The portable build runs Vinext directly without a host `timeout` command. The managed-linux build uses `scripts/build-verified.sh` and its existing `SITES_BUILD_TIMEOUT` setting.
+| Variable | Purpose |
+| --- | --- |
+| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `APP_BASE_URL` | Sessions, signing, and canonical app links |
+| `TMDB_READ_ACCESS_TOKEN` | Server-side TMDB metadata only |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Optional Google OAuth |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Verification/reset email delivery |
+| `PLAYBACK_PROVIDER` and provider-specific keys | Owner-configured Mux, Cloudflare Stream, Bunny, or private library integrations |
+| `IPTV_PLAYLIST_URL` | Optional IPTV-org playlist source; default listing is metadata, not a rights grant |
 
-## Learn More
+Do not put provider secrets in client code. Download access requires verified rights and a short-lived signed URL. Do not create paid provider accounts or deploy without explicit owner approval.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Database
+
+The Drizzle schema lives in [`db/schema.ts`](db/schema.ts); generated SQL migrations are in [`drizzle/`](drizzle/). After schema edits:
+
+```powershell
+pnpm db:generate
+pnpm exec wrangler d1 migrations apply octotv-db --local --config wrangler.d1.jsonc --persist-to .wrangler/state
+```
+
+Production migrations are not run automatically. Configure a real D1 database ID and apply reviewed migrations as a separate, authorized release step. R2 is optional for local development and production; this project does not provision buckets.
+
+## Quality checks
+
+```powershell
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+```
+
+The Node-native test suite covers locale dictionary parity, playback-token signing/tampering/expiry, authorized server selection and fallback rules, quality filtering, M3U parsing, NSFW exclusion, and channel blocklists. Lint currently reports only the framework's `<img>` performance advisories; no lint errors.
+
+## Deployment and operating cost
+
+Deployment is intentionally not performed from this repository session. A Cloudflare Workers + D1 + R2 deployment is a reasonable target, but actual monthly spend depends on current plan allowances, requests, database reads/writes, stored media, and video delivery. Video bandwidth/storage is likely the dominant variable cost; evaluate each media provider's current pricing, egress policy, and licensing terms before choosing one.
+
+- [Cloudflare Workers pricing](https://developers.cloudflare.com/workers/platform/pricing/)
+- [Cloudflare D1 pricing](https://developers.cloudflare.com/d1/platform/pricing/)
+- [Cloudflare R2 pricing](https://developers.cloudflare.com/r2/pricing/)
+- [Mux pricing](https://www.mux.com/pricing)
+- [Cloudflare Stream pricing](https://developers.cloudflare.com/stream/pricing/)
+- [Bunny Stream pricing](https://bunny.net/pricing/stream/)
+
+Review current vendor pricing rather than relying on a static estimate. Before a launch, configure production secrets, authorized content and rights windows, verified email/OAuth redirect URLs, backups/retention, rate limits, monitoring, and applicable legal/privacy notices.
+
+## Project reports
+
+Implementation status and verification notes are tracked under [`docs/reports/`](docs/reports/). The original project brief and requirements are retained in [`CODEX_HANDOFF_AR.md`](CODEX_HANDOFF_AR.md).

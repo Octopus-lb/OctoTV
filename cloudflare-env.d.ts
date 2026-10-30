@@ -21,8 +21,10 @@ declare namespace Cloudflare {
     MUX_TOKEN_SECRET?: string;
     CLOUDFLARE_ACCOUNT_ID?: string;
     CLOUDFLARE_STREAM_API_TOKEN?: string;
+    CLOUDFLARE_STREAM_SUBDOMAIN?: string;
     BUNNY_STREAM_API_KEY?: string;
     BUNNY_STREAM_LIBRARY_ID?: string;
+    BUNNY_STREAM_PULL_ZONE?: string;
 
     R2_ACCESS_KEY_ID?: string;
     R2_SECRET_ACCESS_KEY?: string;

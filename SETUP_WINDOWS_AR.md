@@ -23,6 +23,10 @@ cd D:\OctoTV
 corepack enable
 corepack prepare pnpm@11.25.0 --activate
 pnpm install
+Copy-Item .env.example .dev.vars
+# عدّل .dev.vars وضع قيمة عشوائية محلية لـ BETTER_AUTH_SECRET
+pnpm db:generate
+pnpm exec wrangler d1 migrations apply octotv-db --local --config wrangler.d1.jsonc --persist-to .wrangler/state
 pnpm dev
 ```
 
@@ -40,6 +44,8 @@ http://localhost:5173
 
 ## ملاحظات مهمة
 
-- أُزيل ملف `.openai/hosting.json` عمدًا لأن معرّف مشروع Sites القديم غير متاح في الحساب الآخر. يستطيع Codex إنشاء إعداد استضافة جديد عند اختيار المنصة.
-- النسخة الحالية واجهة أولية عاملة وقنوات تجريبية؛ نظام الحسابات متعدد اللغات والمزامنة الدورية موصوفان في `CODEX_HANDOFF_AR.md` وما زالا ضمن مرحلة التطوير.
-- لا توجد مفاتيح سرية أو مجلد `node_modules` داخل الأرشيف.
+- `.dev.vars` محلي فقط ومضاف إلى `.gitignore`؛ لا ترفع أي أسرار إلى Git.
+- دون `TMDB_READ_ACCESS_TOKEN` تعرض الواجهة بيانات كتالوج تجريبية موسومة بوضوح. تشغيل مصادقة Better Auth محليًا يتطلب `BETTER_AUTH_SECRET`.
+- بث الفيديو في وضع العرض يستخدم روابط اختبار عامة للتحقق من المشغل فقط. يلزم إعداد مزود أصول مرخّص وربط ملفات تملك حقوقها قبل تشغيل محتوى فعلي.
+- لا ينشئ المشروع موارد Cloudflare مدفوعة ولا ينشر تلقائيًا. راجع `README.md` وتعليمات التقارير في `docs/reports/` قبل الإطلاق.
+- لا توجد أسرار إنتاج أو مجلد `node_modules` داخل الأرشيف.

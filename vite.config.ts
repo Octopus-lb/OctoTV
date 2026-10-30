@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
  * Workers runtime. Configuration is intentionally self-contained: nothing here
  * depends on the retired ChatGPT Sites hosting manifest.
  */
-export default defineConfig(async ({ command }) => {
+export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   const localBindings = {
