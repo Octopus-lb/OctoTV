@@ -104,6 +104,7 @@ export const fr: Messages = {
   "catalog.cast": "Distribution",
   "catalog.recommendations": "Vous aimerez aussi",
   "catalog.trailer": "Bande-annonce",
+  "catalog.source": "Source",
   "catalog.releaseDate": "Date de sortie",
   "catalog.runtime": "Durée",
   "catalog.status": "Statut",

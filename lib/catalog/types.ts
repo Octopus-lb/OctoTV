@@ -1,6 +1,15 @@
 export type TitleType = "movie" | "tv" | "anime";
 
-export type MetadataSource = "tmdb" | "anilist" | "demo";
+export type MetadataSource = "tmdb" | "anilist" | "demo" | "open";
+
+/** Distribution license for content that OctoTV may stream without a contract. */
+export type CatalogLicense = {
+  name: string;
+  url: string;
+  attribution: string;
+  sourceUrl: string;
+  downloadable: boolean;
+};
 
 export type CatalogTitle = {
   id: string;
@@ -27,6 +36,7 @@ export type CatalogTitle = {
   trailerKey: string | null;
   source: MetadataSource;
   isDemo: boolean;
+  license?: CatalogLicense;
 };
 
 export type CatalogCastMember = {

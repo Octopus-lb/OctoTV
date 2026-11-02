@@ -104,6 +104,7 @@ export const tr: Messages = {
   "catalog.cast": "Oyuncular",
   "catalog.recommendations": "Bunları da beğenebilirsiniz",
   "catalog.trailer": "Fragman",
+  "catalog.source": "Kaynak",
   "catalog.releaseDate": "Çıkış tarihi",
   "catalog.runtime": "Süre",
   "catalog.status": "Durum",

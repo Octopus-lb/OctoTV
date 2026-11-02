@@ -104,6 +104,7 @@ export const ar: Messages = {
   "catalog.cast": "طاقم التمثيل",
   "catalog.recommendations": "قد يعجبك أيضًا",
   "catalog.trailer": "الإعلان",
+  "catalog.source": "المصدر",
   "catalog.releaseDate": "تاريخ الإصدار",
   "catalog.runtime": "المدة",
   "catalog.status": "الحالة",

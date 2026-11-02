@@ -6,6 +6,7 @@ import { fr } from "../lib/i18n/messages/fr.ts";
 import { tr } from "../lib/i18n/messages/tr.ts";
 import { filterChannels, parseM3U } from "../lib/live/filters.ts";
 import type { LiveChannel } from "../lib/live/types.ts";
+import { getOpenStream, openCatalog } from "../lib/catalog/open-catalog.ts";
 import { isPlaybackAssetAuthorized } from "../lib/playback/authorization.ts";
 import { signToken, verifyToken } from "../lib/playback/token.ts";
 import { filterQualities, selectServer } from "../lib/playback/types.ts";
@@ -163,4 +164,33 @@ test("channel country and category filters match normalized metadata", () => {
   };
   assert.deepEqual(filterChannels([channel], { country: "tr" }).map((item) => item.id), ["regional-news"]);
   assert.deepEqual(filterChannels([channel], { category: "culture" }).map((item) => item.id), ["regional-news"]);
+});
+
+test("open catalog entries are licensed, attributable, and served over HTTPS", () => {
+  assert.ok(openCatalog.length >= 8, "expected a usable open catalog");
+  const seen = new Set<string>();
+  for (const title of openCatalog) {
+    assert.match(title.id, /^open-/);
+    assert.equal(title.isDemo, false);
+    assert.equal(title.source, "open");
+    assert.ok(!seen.has(title.id), `duplicate id ${title.id}`);
+    seen.add(title.id);
+    assert.ok(title.license, `${title.id} is missing license metadata`);
+    assert.match(title.license.url, /^https:\/\//);
+    assert.match(title.license.sourceUrl, /^https:\/\//);
+    assert.ok(title.license.attribution.trim().length > 0);
+
+    const stream = getOpenStream(title.id);
+    assert.ok(stream, `${title.id} has no stream`);
+    assert.match(stream.url, /^https:\/\//, `${title.id} must not use insecure delivery`);
+    assert.equal(stream.type, "mp4");
+  }
+});
+
+test("open catalog never references rejected third-party players", () => {
+  const rejected = ["movy.sx", "wecollege.net", "vidy.st", "shd-gcp", "edgenextcdn.net"];
+  const corpus = JSON.stringify(openCatalog);
+  for (const host of rejected) {
+    assert.equal(corpus.includes(host), false, `open catalog must not reference ${host}`);
+  }
 });

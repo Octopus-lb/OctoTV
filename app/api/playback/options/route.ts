@@ -12,13 +12,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "missing_content_id" }, { status: 400 });
   }
 
-  const isDemo = contentId.startsWith("demo-");
+  // Open catalog titles (public domain / CC BY) and demo records are streamed
+  // from their publisher without an account. Licensed providers still require
+  // a session.
+  const isPublic = contentId.startsWith("demo-") || contentId.startsWith("open-");
   const session = await getSession();
-  if (!isDemo && !session) {
+  if (!isPublic && !session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const viewer = isDemo ? null : await getViewer();
+  const viewer = isPublic ? null : await getViewer();
   const options = await getPlaybackOptions(contentId, viewer?.profile.id);
 
   return NextResponse.json(

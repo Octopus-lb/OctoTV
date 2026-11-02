@@ -130,6 +130,26 @@ export function TitleDetailView({
             </div>
 
             {detail.isDemo && <p className="rights-note">{t("common.demoNotice")}</p>}
+            {detail.license && (
+              <p className="rights-note">
+                {detail.license.attribution}{" "}
+                <a
+                  href={detail.license.url}
+                  target="_blank"
+                  rel="noreferrer noopener license"
+                >
+                  {detail.license.name}
+                </a>
+                {" · "}
+                <a
+                  href={detail.license.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {t("catalog.source")}
+                </a>
+              </p>
+            )}
           </div>
         </div>
       </section>

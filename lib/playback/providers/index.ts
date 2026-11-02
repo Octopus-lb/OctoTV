@@ -3,6 +3,8 @@ import type { PlaybackProvider } from "../types";
 import { createDbBackedProvider } from "./db-backed";
 import { DemoPlaybackProvider } from "./demo";
 export { DemoPlaybackProvider } from "./demo";
+import { OpenMediaProvider } from "./open";
+export { OpenMediaProvider } from "./open";
 
 export const muxProvider = createDbBackedProvider({
   id: "mux",
@@ -71,6 +73,7 @@ const registry = new Map<string, PlaybackProvider>();
 
 for (const provider of [
   new DemoPlaybackProvider(),
+  new OpenMediaProvider(),
   muxProvider,
   cloudflareStreamProvider,
   bunnyStreamProvider,
@@ -89,6 +92,7 @@ export function allProviders(): PlaybackProvider[] {
 
 export const providerIds = [
   "demo",
+  "open",
   "mux",
   "cloudflare-stream",
   "bunny",

@@ -102,6 +102,7 @@ export const en = {
   "catalog.cast": "Cast",
   "catalog.recommendations": "You may also like",
   "catalog.trailer": "Trailer",
+  "catalog.source": "Source",
   "catalog.releaseDate": "Release date",
   "catalog.runtime": "Runtime",
   "catalog.status": "Status",

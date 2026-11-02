@@ -7,6 +7,7 @@ import {
   demoCatalog,
   getDemoDetail,
 } from "./demo-data";
+import { getOpenDetail, isOpenId, openCatalog } from "./open-catalog";
 import { getTitleFromDb, listTitlesFromDb } from "./repository";
 import type {
   CatalogDetail,
@@ -29,8 +30,19 @@ export type HomeData = {
   degraded: boolean;
 };
 
+/**
+ * Fallback catalog used when neither the database nor TMDB is available.
+ *
+ * Real public-domain and CC BY films lead; the fictional demo series/anime
+ * records stay only to exercise TV/anime layouts and are labelled DEMO.
+ */
+const fallbackCatalog: CatalogTitle[] = [
+  ...openCatalog,
+  ...demoCatalog.filter((item) => item.type !== "movie"),
+];
+
 function demoSorted(sort: CatalogQuery["sort"]): CatalogTitle[] {
-  const items = [...demoCatalog];
+  const items = [...fallbackCatalog];
   if (sort === "rating") {
     return items.sort((a, b) => (b.voteAverage ?? 0) - (a.voteAverage ?? 0));
   }
@@ -63,7 +75,7 @@ function demoPage(query: CatalogQuery): CatalogPage {
     page: 1,
     totalPages: 1,
     totalResults: items.length,
-    source: "demo",
+    source: items.some((item) => item.source === "open") ? "mixed" : "demo",
   };
 }
 
@@ -124,7 +136,7 @@ export async function getHomeData(locale: Locale): Promise<HomeData> {
 
   const degraded = !trending.length;
 
-  const fallbackMovies = movies.length ? movies : demoByType("movie");
+  const fallbackMovies = movies.length ? movies : openCatalog;
   const fallbackShows = shows.length ? shows : demoByType("tv");
   const fallbackAnime = anime.length ? anime : demoByType("anime");
   const featuredPool = trending.length
@@ -227,6 +239,7 @@ export async function getTitleDetail(
   locale: Locale,
   typeHint?: TitleType,
 ): Promise<CatalogDetail | null> {
+  if (id.startsWith("open-")) return getOpenDetail(id);
   if (id.startsWith("demo-")) return getDemoDetail(id);
 
   const fromDb = await getTitleFromDb(id);
@@ -272,3 +285,5 @@ export async function getTitleDetail(
 export function isDemoId(id: string): boolean {
   return id.startsWith("demo-");
 }
+
+export { isOpenId };

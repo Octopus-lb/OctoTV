@@ -130,7 +130,7 @@ The test suite covers locale dictionary parity, same-origin request checks, play
 - Configure backups, retention/deletion rules, monitoring, incident ownership, email/OAuth credentials, and applicable legal notices before launch.
 - The repository's legal and operations notes are implementation placeholders, not legal advice or a certification of compliance.
 
-See [`docs/security-operations.md`](docs/security-operations.md) for the production-readiness checklist and [`docs/reports/`](docs/reports/) for implementation and QA reports.
+See [`docs/security-operations.md`](docs/security-operations.md) for the production-readiness checklist, [`docs/content-sources.md`](docs/content-sources.md) for the approved and rejected content sources plus the cost model, and [`docs/reports/`](docs/reports/) for implementation and QA reports.
 
 ## Deployment
 
