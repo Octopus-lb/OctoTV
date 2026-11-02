@@ -94,7 +94,7 @@ function collectGenres(items: CatalogTitle[]) {
 
 export async function getHomeData(locale: Locale): Promise<HomeData> {
   const dbPage = await listTitlesFromDb({ page: 1, perPage: 60 });
-  if (dbPage?.items.length) {
+  if (dbPage?.items.length && !tmdbEnabled()) {
     const items = dbPage.items;
     const movies = items.filter((item) => item.type === "movie");
     const shows = items.filter((item) => item.type === "tv");
@@ -169,7 +169,10 @@ export async function listCatalog(
   locale: Locale,
 ): Promise<CatalogPage> {
   const dbPage = await listTitlesFromDb(query);
-  if (dbPage?.items.length) return dbPage;
+  // D1 may contain only the small open-media seed catalog. When TMDB is
+  // configured, use its paginated catalog instead of treating those seed
+  // records as the complete movie library. Keep D1 as an offline fallback.
+  if (dbPage?.items.length && (!tmdbEnabled() || query.type === "anime")) return dbPage;
 
   if (query.query?.trim()) {
     const term = query.query.trim();
@@ -224,6 +227,7 @@ export async function listCatalog(
     if (page?.items.length) return page;
   }
 
+  if (dbPage?.items.length) return dbPage;
   return demoPage(query);
 }
 

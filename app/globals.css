@@ -1840,6 +1840,89 @@ html[data-theme="light"] .info-panel, html[data-theme="light"] .settings-block, 
 html[data-theme="light"] .channel-card, html[data-theme="light"] .filter-bar input, html[data-theme="light"] .filter-bar select, html[data-theme="light"] .channel-search, html[data-theme="light"] .episode-card, html[data-theme="light"] .session-row { background-color: #fff; color: #25241f; }
 html[data-theme="light"] .mobile-nav { background: rgba(250,249,246,.97); border-color: rgba(79,70,54,.16); }
 html[data-theme="light"] .mobile-nav a { color: #68665e; }
+/* Keep auth layouts inside the visual viewport at every breakpoint/zoom. */
+.auth-page { width: 100%; min-width: 0; }
+.auth-card { width: min(430px, calc(100vw - 32px)); min-width: 0; max-width: 100%; }
+.auth-card > *, .auth-form, .auth-form label { min-width: 0; }
+.auth-form input { width: 100%; max-width: 100%; min-width: 0; }
+.auth-subtitle { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 520px) {
+  .auth-page { min-height: 100svh; padding: 92px 16px calc(90px + env(safe-area-inset-bottom)); }
+  .auth-card { padding: 24px 20px; border-radius: 16px; }
+}
+
+/* A complete, readable light palette for the catalog and live-TV surfaces. */
+html[data-theme="light"] .channel-card,
+html[data-theme="light"] .channel-card:hover {
+  border-color: rgba(79,70,54,.16);
+  background: linear-gradient(145deg, #fff, #eeece6);
+  color: #24231e;
+}
+html[data-theme="light"] .channel-copy strong { color: #25241f; }
+html[data-theme="light"] .channel-copy small { color: #69675f; }
+html[data-theme="light"] .channel-logo { background: #e6e3dc; color: #25241f; }
+html[data-theme="light"] .genre-card,
+html[data-theme="light"] .genre-card:hover {
+  border-color: rgba(79,70,54,.14);
+  background: linear-gradient(145deg, #fff, #eeece6 76%);
+  color: #25241f;
+}
+html[data-theme="light"] .genre-card > span:last-child { color: #69675f; }
+html[data-theme="light"] .genre-icon { background: rgba(177,139,74,.1); }
+html[data-theme="light"] .filter-bar select,
+html[data-theme="light"] .filter-bar input,
+html[data-theme="light"] .search-field,
+html[data-theme="light"] .channel-search,
+html[data-theme="light"] .filter-toggle,
+html[data-theme="light"] .favorite-filter,
+html[data-theme="light"] .collection-tabs button {
+  border-color: rgba(79,70,54,.19);
+  background: #fff;
+  color: #25241f;
+}
+html[data-theme="light"] .search-field input,
+html[data-theme="light"] .channel-search input { color: #25241f; }
+html[data-theme="light"] .search-field input::placeholder,
+html[data-theme="light"] .channel-search input::placeholder { color: #77746c; }
+html[data-theme="light"] .collection-tabs button.active,
+html[data-theme="light"] .collection-tabs button:hover,
+html[data-theme="light"] .filter-toggle.active { background: var(--accent); color: #15130f; }
+html[data-theme="light"] .filter-advanced label,
+html[data-theme="light"] .filter-bar label { color: #625f57; }
+html[data-theme="light"] .favorite-filter.active { color: #79591f; }
+html[data-theme="light"] .info-panel, html[data-theme="light"] .settings-block,
+html[data-theme="light"] .admin-panel, html[data-theme="light"] .legal-body,
+html[data-theme="light"] .auth-card, html[data-theme="light"] .lists-sidebar,
+html[data-theme="light"] .stat-card, html[data-theme="light"] .season-block,
+html[data-theme="light"] .profile-tile, html[data-theme="light"] .episode-card,
+html[data-theme="light"] .session-row, html[data-theme="light"] .provider-row {
+  border-color: rgba(79,70,54,.15);
+  background: linear-gradient(150deg, #fff, #f0eee8);
+  color: #25241f;
+}
+html[data-theme="light"] .auth-card h1 { color: #25241f; }
+html[data-theme="light"] .auth-subtitle,
+html[data-theme="light"] .auth-form label,
+html[data-theme="light"] .auth-links,
+html[data-theme="light"] .checkbox-row { color: #625f57; }
+html[data-theme="light"] .auth-form input,
+html[data-theme="light"] .profile-create input,
+html[data-theme="light"] .list-create-form input,
+html[data-theme="light"] .admin-form input,
+html[data-theme="light"] .settings-group select {
+  border-color: rgba(79,70,54,.19);
+  background: #fff;
+  color: #25241f;
+}
+html[data-theme="light"] .auth-form input::placeholder { color: #77746c; }
+html[data-theme="light"] .auth-legal { color: #706d65; }
+html[data-theme="light"] .auth-links a { color: #76571e; }
+html[data-theme="light"] .mobile-sheet nav a { color: #3b3933; }
+html[data-theme="light"] .view-all, html[data-theme="light"] .detail-facts,
+html[data-theme="light"] .detail-overview, html[data-theme="light"] .tagline { color: #514f48; }
+html[data-theme="light"] .info-panel dt, html[data-theme="light"] .info-panel dd,
+html[data-theme="light"] .info-panel > span { color: #514f48; }
+html[data-theme="light"] .footer, html[data-theme="light"] footer { color: #66635b; }
 @media (max-width: 520px) {
   .site-settings-popover { inset-inline: 10px; top: calc(100% + 2px); width: auto; }
   .preference-cookie-note { inset-inline: 12px; bottom: calc(82px + env(safe-area-inset-bottom)); width: auto; gap: 10px; padding: 12px; }
