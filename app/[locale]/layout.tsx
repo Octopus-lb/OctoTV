@@ -10,6 +10,7 @@ import { PwaExperience } from "@/components/pwa-experience";
 import { getDirection, isLocale, locales, type Locale } from "@/lib/i18n/config";
 import { createTranslator } from "@/lib/i18n";
 import { getSession, isAdminUser } from "@/lib/auth/server";
+import { cookies } from "next/headers";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -72,9 +73,13 @@ export default async function LocaleLayout({
 
   const session = await getSession();
   const admin = await isAdminUser(session?.user ?? null);
+  const cookieStore = await cookies();
+  const themePreference = cookieStore.get("octotv_theme")?.value;
+  const initialTheme = themePreference === "light" || themePreference === "system" ? themePreference : "dark";
+  const hasCookieConsent = cookieStore.get("octotv_preferences_consent")?.value === "accepted";
 
   return (
-    <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
+    <html lang={locale} dir={getDirection(locale)} data-theme={initialTheme} data-theme-preference={themePreference ?? "dark"} suppressHydrationWarning>
       <body>
         <a className="skip-link" href="#main-content">
           {locale === "ar" ? "تخطَّ إلى المحتوى" : "Skip to content"}
@@ -84,6 +89,8 @@ export default async function LocaleLayout({
           <PwaExperience />
           <SiteHeader
             locale={locale}
+            initialTheme={initialTheme}
+            hasCookieConsent={hasCookieConsent}
             user={
               session
                 ? {
